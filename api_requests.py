@@ -7,13 +7,12 @@ load_dotenv()
 
 API_KEY_LOC = os.getenv('API_KEY_LOC')
 
-class ApiRequest:
-    # Helper function
-    def kelvin_to_celsius(kelvin):
+def kelvin_to_celsius(kelvin):
         """Convert temperature from Kelvin to Celsius."""
         celsius = kelvin - 273.15
         return int(celsius)
 
+class ApiRequest:
     def request_loc_code(country_name):
         '''take a country name and return its ISO code.
         String --> String'''
@@ -44,7 +43,8 @@ class ApiRequest:
         json_dict = json.loads(json_string)
         return (kelvin_to_celsius(json_dict['list'][0]['main']['temp']),
                 json_dict['list'][0]['main']['humidity'])
-    
+
+
 # country = request_loc_code('france')
 # print(country)
 
