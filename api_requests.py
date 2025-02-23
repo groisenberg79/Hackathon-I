@@ -42,7 +42,7 @@ class ApiRequest:
         json_string = json.dumps(data)
         json_dict = json.loads(json_string)
         return (kelvin_to_celsius(json_dict['list'][0]['main']['temp']),
-                json_dict['list'][0]['main']['humidity'])
+                json_dict['list'][0]['main']['humidity']) # have to check for 200, 400 cases
 
 
 # country = request_loc_code('france')
