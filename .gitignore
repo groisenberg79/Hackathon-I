@@ -1,3 +1,4 @@
 myEnv\
 .env
 db_destinations.sql
+__pycache__/
