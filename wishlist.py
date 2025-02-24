@@ -57,70 +57,50 @@ class Wishlist:
         exists = cursor.fetchone()[0]
         connection.commit()
         return exists
-
+    
+    def row_exists(wishlist_name, country, city):
+        cursor = connection.cursor()
+        cursor.execute(f'''SELECT 
+                                COUNT(*) FROM {wishlist_name}
+                            WHERE 
+                                {wishlist_name}.country_name = '{country}'
+                                AND  {wishlist_name}.city_name = '{city}' ''')
+        count = cursor.fetchall()
+        cursor.close()
+        if count[0][0] > 0:
+            return 1
+        else:
+            return 0
 
     def add_to_wishlist(wishlist_name, place):
-        '''if wishlist_name exists:
-               - update wishlist with new entry (row)
-                 with data in Place object and return 1
-            else:
-               - return 0'''
-        exists = Wishlist.table_exists(wishlist_name)
-        if exists:
-            cursor = connection.cursor()
-            cursor.execute(f'''INSERT INTO 
-                                    {wishlist_name} (country_name, city_name, temp, humidity)
-                                VALUES(
-                                    '{place.country_name}',
-                                    '{place.city_name}',
-                                    '{place.temp}',
-                                    '{place.humidity}')
-                            ''')
-            connection.commit()
-            return 1
-        else:
-            return 0
+        cursor = connection.cursor()
+        cursor.execute(f'''INSERT INTO 
+                                {wishlist_name} (country_name, city_name, temp, humidity)
+                            VALUES(
+                                '{place.country_name}',
+                                '{place.city_name}',
+                                '{place.temp}',
+                                '{place.humidity}')
+                        ''')
+        connection.commit()
 
-    def delete_from_wishlist(wishlist_name, place):
-        '''if table exists:
-                - delete destination from wishlist and return 1
-            else:
-                - return 0'''
-        exists = Wishlist.table_exists(wishlist_name)
-        if exists:
-            cursor = connection.cursor()
-            cursor.execute(f'''DELETE FROM 
-                                {wishlist_name}
-                            WHERE
-                                country_name = '{place.country_name}' AND
-                                city_name = '{place.city_name}'
-                            ''')
-            connection.commit()
-            return 1
-        else:
-            return 0
+    def delete_from_wishlist(wishlist_name, country, city):
+        cursor = connection.cursor()
+        cursor.execute(f'''DELETE FROM 
+                            {wishlist_name}
+                        WHERE
+                            country_name = '{country}' AND
+                            city_name = '{city}'
+                        ''')
+        connection.commit()
+
     
     def delete_wishlist(wishlist_name):
-        '''if table whishlist_name exists:
-                - print table and return 1
-            else:
-                - return 0'''
-        exists = Wishlist.table_exists(wishlist_name)
-        if exists:
             cursor = connection.cursor()
             cursor.execute(f'''DROP TABLE  {wishlist_name} ''')
             connection.commit()
-            return 1
-        else:
-            return 0
 
     def print_wishlist(wishlist_name):
-        '''if table exists:
-                - return wishlist as f-string
-            else:
-                - return None'''
-        exists = Wishlist.table_exists(wishlist_name)
-        if exists:
             cursor = connection.cursor()
             cursor.execute(f'''SELECT
                                 country_name, city_name, temp, humidity FROM {wishlist_name}
@@ -131,10 +111,9 @@ class Wishlist:
                 destinations += f"-- COUNTRY: {row[0]} | CITY: {row[1]} | TEMP: {row[2]} Celsius | HUMIDITY: {row[3]}%\n"
             cursor.close()
             return destinations
-        else:
-            return None
     
     def print_names_wishlist():
+        '''print the title  of all wishlists stored'''
         cursor = connection.cursor()
         cursor.execute('''SELECT
                             tablename FROM pg_tables
@@ -153,8 +132,8 @@ class Wishlist:
 # table = Wishlist.print_wishlist('my_list')
 # print(table)
 
-# Wishlist.create_wishlist('my_list')
-# Wishlist.create_wishlist('my_list2')
-# Wishlist.create_wishlist('my_list3')
+# Wishlist.delete_wishlist('my_list2')
+# Wishlist.delete_wishlist('my_list3')
+# Wishlist.delete_wishlist('travel_destination')
 # names = Wishlist.print_names_wishlist()
-# print(names)
+# print(names == "")
